@@ -6,7 +6,7 @@ BetterSinkholes2 is a plugin that makes **sinkhole environmental hazards** (foun
 - This plugin uses [EXILED](https://github.com/galaxy119/EXILED/).
 - Make sure the config option in `config_gameplay.txt` called `sinkhole_spawn_chance` is set to higher than 0.
 
-Note: **BetterSinkholes2 is only guaranteed to work with Exiled 4.1.7(+) and SCP:SL 11(+)!**
+Note: **BetterSinkholes2 is only made to work with Exiled 6.0.0(+) and SCP:SL 12(+)!**
 
 ## Releases and Installation
 You can find the latest release [here](https://github.com/rby-blackruby/BetterSinkholes2/releases).
