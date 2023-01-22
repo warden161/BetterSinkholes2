@@ -1,39 +1,39 @@
-﻿using BetterSinkholes2.Configuration;
-using Exiled.API.Features;
-using HarmonyLib;
+﻿using Exiled.API.Features;
+using Exiled.Events.EventArgs.Player;
+using Hazards;
+using UnityEngine;
+using CustomPlayerEffects;
 
 namespace BetterSinkholes2
 {
-    internal class BetterSinkholes2 : Plugin<Config>
+    public class BetterSinkholes2 : Plugin<Config>
     {
-        public static int PatchCount = 0;
-        public static Harmony harmony { set; get; }
-        public static Config config;
-        public static Translation translation;
-
         public override void OnEnabled()
         {
-            config = Config;
-            translation = new Translation();
-
-            if (config.IsEnabled)
-            {
-                Log.Info("Loaded BetterSinkholes2 plugin.");
-                DoPatching();
-            }
-
+            Exiled.Events.Handlers.Player.StayingOnEnvironmentalHazard += OnStayingOnSinkhole;
+            base.OnEnabled();
         }
 
         public override void OnDisabled()
         {
-            harmony.UnpatchAll();
+            Exiled.Events.Handlers.Player.StayingOnEnvironmentalHazard -= OnStayingOnSinkhole;
+            base.OnDisabled();
         }
 
-        // Enables the modifications made to the sinkholes
-        public static void DoPatching()
+        public void OnStayingOnSinkhole(StayingOnEnvironmentalHazardEventArgs ev)
         {
-            harmony = new Harmony($"blackruby.exiled.bettersinkholes2{++PatchCount}");
-            harmony.PatchAll();
+            if (ev.EnvironmentalHazard is not SinkholeEnvironmentalHazard sinkhole)
+                return;
+
+            if (ev.Player.IsScp || ev.Player.IsGodModeEnabled)
+                return;
+
+            if ((double)Vector3.Distance(ev.Player.Position, sinkhole.transform.position) > (double)sinkhole.MaxDistance * Config.TeleportDistance)
+                return;
+
+            ev.Player.DisableEffect<Sinkhole>();
+            ev.Player.EnableEffect<Corroding>();
+            ev.Player.Broadcast(Config.TeleportMessageDuration, Config.TeleportMessage);
         }
     }
 }
